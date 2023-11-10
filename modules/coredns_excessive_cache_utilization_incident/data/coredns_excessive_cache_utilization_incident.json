@@ -1,0 +1,138 @@
+{
+  "name": "coredns_excessive_cache_utilization_incident",
+  "description": "This incident type typically occurs when the CoreDNS service is consuming an excessive amount of cache. CoreDNS is a flexible and extensible DNS server that is used in Kubernetes clusters for service discovery and load balancing. However, when the cache utilization becomes too high, it can result in performance degradation, service disruptions, and even system crashes. This incident requires immediate attention from the DevOps team to identify the root cause and implement a solution to prevent it from happening again.",
+  "params": [
+    {
+      "name": "NEW_MEMORY_REQUEST",
+      "value": ""
+    },
+    {
+      "name": "YOUR_CLUSTER_NAME",
+      "value": ""
+    },
+    {
+      "name": "COREDNS_POD_NAME",
+      "value": ""
+    },
+    {
+      "name": "NEW_CPU_REQUEST",
+      "value": ""
+    },
+    {
+      "name": "CACHE_SIZE",
+      "value": ""
+    },
+    {
+      "name": "K8S_CLUSTER_NAME",
+      "value": ""
+    },
+    {
+      "name": "NAMESPACE",
+      "value": ""
+    }
+  ],
+  "cells": [
+    {
+      "name": "cell_1",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## CoreDNS Excessive Cache Utilization Incident\nThis incident type typically occurs when the CoreDNS service is consuming an excessive amount of cache. CoreDNS is a flexible and extensible DNS server that is used in Kubernetes clusters for service discovery and load balancing. However, when the cache utilization becomes too high, it can result in performance degradation, service disruptions, and even system crashes. This incident requires immediate attention from the DevOps team to identify the root cause and implement a solution to prevent it from happening again."
+    },
+    {
+      "name": "cell_2",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## List all the pods in the default namespace"
+    },
+    {
+      "name": "cell_3",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | limit=1 | random=1 | `kubectl get pods`"
+    },
+    {
+      "name": "cell_4",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the logs of the CoreDNS pods to see if there are any errors or warnings"
+    },
+    {
+      "name": "cell_5",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | limit=1 | random=1 | `kubectl logs ${COREDNS_POD_NAME}`"
+    },
+    {
+      "name": "cell_6",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the resource usage of the CoreDNS pods to see if they are consuming too much memory or CPU"
+    },
+    {
+      "name": "cell_7",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | limit=1 | random=1 | `kubectl top pods ${COREDNS_POD_NAME}`"
+    },
+    {
+      "name": "cell_8",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the CoreDNS configuration file to see if there are any misconfigurations that could be causing the excessive cache utilization"
+    },
+    {
+      "name": "cell_9",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE | `cat /etc/coredns/Corefile`"
+    },
+    {
+      "name": "cell_10",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Restart the CoreDNS pods to see if it resolves the issue temporarily"
+    },
+    {
+      "name": "cell_11",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | limit=1 | random=1 | `kubectl delete pod ${COREDNS_POD_NAME}`"
+    },
+    {
+      "name": "cell_12",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the events log to see if there are any relevant events that could be related to the excessive cache utilization"
+    },
+    {
+      "name": "cell_13",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | limit=1 | random=1 | `kubectl get events`"
+    },
+    {
+      "name": "cell_14",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Increase the resources allocated to the Kubernetes cluster, such as memory or CPU, to accommodate the increased cache utilization."
+    },
+    {
+      "name": "cell_15",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | random=1 | limit=1 | invoke_update_deployment_config($NEW_MEMORY_REQUEST, $YOUR_CLUSTER_NAME, $NEW_CPU_REQUEST)"
+    },
+    {
+      "name": "cell_16",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Configure CoreDNS to limit the maximum size of the cache to prevent it from consuming too many resources."
+    },
+    {
+      "name": "cell_17",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | random=1 | limit=1 | invoke_cdns_set_cache_size($CACHE_SIZE)"
+    }
+  ]
+}
